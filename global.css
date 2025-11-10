@@ -1,0 +1,18 @@
+dl {
+  display: grid;
+  grid-template-columns: /*4 equally spaced columns*/ repeat(4, 1fr);
+  grid-template-rows: auto auto; /* two rows — one for dt and one for dd */
+  gap: 1rem;
+}
+
+dt {
+  grid-row: 1; /* force all dt elements into the first row */
+  text-align: center;
+  font-weight: bold;
+}
+
+dd {
+  grid-row: 2; /* force all dd elements into the second row */
+  text-align: center;
+  margin: 0;
+}

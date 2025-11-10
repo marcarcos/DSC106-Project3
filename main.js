@@ -18,6 +18,8 @@ const svg = d3.select('#map-container')
     .attr('width', width)
     .attr('height', height);
 
+const g = svg.append('g');
+
 async function loadFireData() {
   try {
     const fireData = await d3.csv('SUOMI_VIIRS_C2_USA_contiguous_and_Hawaii_7d.csv');
@@ -53,7 +55,7 @@ const pointsProjection = d3.geoMercator() // not geoAlbersUsa()
 
 const path = d3.geoPath().projection(mapProjection);
 
-svg.append('g')
+g.append('g')
   .selectAll('path')
   .data(countries.features)
   .join('path')
@@ -68,13 +70,111 @@ const filteredData = fireData.filter(d => {
   return projected && lat >= 26 && lat <= 49 && lon >= -125 && lon <= -66;
 });
 
-svg.selectAll('circle')
+g.selectAll('circle')
   .data(filteredData)
   .join('circle')
   .attr('cx', d => pointsProjection([d.longitude, d.latitude])[0])
   .attr('cy', d => pointsProjection([d.longitude, d.latitude])[1])
   .attr('r', 2)
   .attr('fill', 'red')
-  .attr('opacity', 0.6);
+  .attr('opacity', 0.4);
 
   console.log('hi');
+
+
+//add time slider functionality
+function timeSlider(value) {
+    const hour = +value;
+    const filteredByTime = fireData.filter(d => {
+        const acqTime = +d.acq_time;
+        return Math.floor(acqTime / 100) === hour;
+    });
+
+    const visibleData = filteredByTime.filter(d => {
+        const lat = +d.latitude;
+        const lon = +d.longitude;
+        const projected = mapProjection([lon, lat]);
+        return projected && lat >= 26 && lat <= 49 && lon >= -125 && lon <= -66;
+    });
+
+    const circles = g.selectAll('circle')
+        .data(visibleData, d => d.latitude + ',' + d.longitude);
+
+    circles.enter()
+        .append('circle')
+        .attr('cx', d => pointsProjection([d.longitude, d.latitude])[0])
+        .attr('cy', d => pointsProjection([d.longitude, d.latitude])[1])
+        .attr('r', 2)
+        .attr('fill', 'red')
+        .attr('opacity', 0.4)
+      .merge(circles)
+        .attr('cx', d => pointsProjection([d.longitude, d.latitude])[0])
+        .attr('cy', d => pointsProjection([d.longitude, d.latitude])[1]);
+
+    circles.exit().remove();
+}
+
+d3.select('#time-slider').on('input', function() {
+    timeSlider(this.value);
+});
+
+//loading tooltip function
+function tooltipLoad(event){
+    const tooltip = d3.select('#tooltip');
+    tooltip.style('left', (event.pageX + 10) + 'px')
+              .style('top', (event.pageY + 10) + 'px')
+              .style('opacity', 1)
+              .html(`Latitude: ${event.latitude}<br>Longitude: ${event.longitude}<br>FRP: ${event.frp}`);
+    
+}
+
+//zoom functionality function
+const zoom = d3.zoom()
+    .scaleExtent([1, 8])
+    .on('zoom', (event) => {
+        g.selectAll('path')
+            .attr('transform', event.transform);
+        g.selectAll('circle')
+            .attr('transform', event.transform)
+            .attr('r', 2 / event.transform.k); // adjust circle size on zoom
+    });
+    
+svg.call(zoom);
+
+//add event listeners for tooltip
+svg.selectAll('circle')
+    .on('mouseover', (event, d) => {
+        //tooltipLoad(d);
+        renderTooltipContent(d);
+        updateTooltipVisibility(true);
+        //updateTooltipPosition(event);
+    })
+    .on('mouseout', () => {
+        updateTooltipVisibility(false);
+    });
+
+
+function renderTooltipContent(fire) {
+  const lat = document.getElementById('tooltip-lat');
+  const lon = document.getElementById('tooltip-lon');
+  const time = document.getElementById('tooltip-time');
+  const frp = document.getElementById('tooltip-frp');
+
+  if (Object.keys(fire).length === 0) return;
+ 
+  lat.textContent = fire.latitude;
+  lon.textContent = fire.longitude;
+  time.textContent = fire.acq_time;
+  frp.textContent = fire.frp;
+}
+
+function updateTooltipVisibility(isVisible) {
+  const tooltip = document.getElementById('fire-tooltip');
+  tooltip.hidden = !isVisible;
+}
+
+function updateTooltipPosition(event) {
+  const tooltip = document.getElementById('commit-tooltip');
+  tooltip.style.left = `${event.clientX}px`;
+  tooltip.style.top = `${event.clientY}px`;
+}
