@@ -18,6 +18,8 @@ const svg = d3.select('#map-container')
     .attr('width', width)
     .attr('height', height);
 
+const g = svg.append('g');
+
 async function loadFireData() {
   try {
     const fireData = await d3.csv('SUOMI_VIIRS_C2_USA_contiguous_and_Hawaii_7d.csv');
@@ -53,7 +55,7 @@ const pointsProjection = d3.geoMercator() // not geoAlbersUsa()
 
 const path = d3.geoPath().projection(mapProjection);
 
-svg.append('g')
+g.append('g')
   .selectAll('path')
   .data(countries.features)
   .join('path')
