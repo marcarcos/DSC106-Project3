@@ -55,37 +55,45 @@ const pointsProjection = d3.geoMercator() // not geoAlbersUsa()
 
 const path = d3.geoPath().projection(mapProjection);
 
-g.append('g')
-  .selectAll('path')
-  .data(countries.features)
-  .join('path')
-  .attr('d', path)
-  .attr('stroke', '#FFFFFF')
 
-svg.append('g')
-  .attr("class", "state-layer")
-  .selectAll('path')
+
+const mapContainer = svg.append("g").attr("id", "mapContainer");
+
+const countriesLayer = mapContainer.append("g")
+  .attr("class", "countries-layer");
+
+countriesLayer.selectAll("path")
+  .data(countries.features)
+  .join("path")
+  .attr("d", path)
+  .attr("stroke", "#FFFFFF");
+
+const statesLayer = mapContainer.append("g")
+  .attr("class", "state-layer");
+
+statesLayer.selectAll("path")
   .data(states.features)
-  .join('path')
-  .attr('d', path)
-  .attr('stroke', '#FFFFFF')
+  .join("path")
+  .attr("d", path)
+  .attr("stroke", "#FFFFFF")
   .attr("pointer-events", "visibleFill")
-  .on("mouseenter", function (event, d) {
+  .on("mouseenter", function(event, d) {
     d3.select(this)
-      .raise()                     
-      .classed("highlighted", true)
+      .raise()
+      .classed("highlighted", true);
 
     tooltip.style("display", "block")
            .html(d.properties.name);
   })
-  .on("mousemove", function (event) {
-    tooltip.style("left", (event.pageX + 10) + "px")
-           .style("top",  (event.pageY + 10) + "px");
+  .on("mousemove", function(event) {
+    tooltip.style("left", event.pageX + 10 + "px")
+           .style("top",  event.pageY + 10 + "px");
   })
-  .on("mouseleave", function () {
+  .on("mouseleave", function() {
     d3.select(this).classed("highlighted", false);
     tooltip.style("display", "none");
   });
+
 
 const filteredData = fireData.filter(d => {
   const lat = +d.latitude;
@@ -97,7 +105,8 @@ const filteredData = fireData.filter(d => {
 const frpExtent = d3.extent(filteredData, d => d.frp);
 const sizeScale = d3.scaleSqrt().domain(frpExtent).range([1, 6]);
 
-svg.selectAll('circle')
+const pointsLayer = mapContainer.append("g").attr("class", "points-layer");
+pointsLayer.selectAll('circle')
   .data(filteredData)
   .join('circle')
   .attr('cx', d => pointsProjection([d.longitude, d.latitude])[0])
@@ -149,17 +158,12 @@ slider.on('input', function() {
   timeSlider(hour);
 });
 
-//zoom functionality function
 const zoom = d3.zoom()
   .scaleExtent([1, 8])
-  .on('zoom', (event) => {
-      g.selectAll('path')
-          .attr('transform', event.transform);
-      g.selectAll('circle')
-          .attr('transform', event.transform)
-          .attr('r', 2 / event.transform.k); // adjust circle size on zoom
+  .on("zoom", (event) => {
+    mapContainer.attr("transform", event.transform);
   });
-  
+
 svg.call(zoom);
 
 //add event listeners for tooltip
