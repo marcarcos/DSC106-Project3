@@ -149,7 +149,16 @@ function timeSlider(value) {
     .attr('r', d => sizeScale(d.frp))
     .attr('fill', 'orangered')
     .attr('opacity', 0.6)
-    .merge(circles);
+    .merge(circles)
+    .on('mouseover', (event, d) => {
+      //tooltipLoad(d);
+      renderTooltipContent(d);
+      updateTooltipVisibility(true);
+      updateTooltipPosition(event);
+    })
+    .on('mouseout', () => {
+      updateTooltipVisibility(false);
+    });
 
     circles.exit().remove();
   }
@@ -167,18 +176,6 @@ const zoom = d3.zoom()
   });
 
 svg.call(zoom);
-
-//add event listeners for tooltip
-svg.selectAll('circle')
-  .on('mouseover', (event, d) => {
-      //tooltipLoad(d);
-      renderTooltipContent(d);
-      updateTooltipVisibility(true);
-      updateTooltipPosition(event);
-  })
-  .on('mouseout', () => {
-      updateTooltipVisibility(false);
-  });
 
 
 function renderTooltipContent(fire) {
