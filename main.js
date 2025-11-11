@@ -18,6 +18,11 @@ const svg = d3.select('#map-container')
     .attr('width', width)
     .attr('height', height);
 
+svg.append("defs")
+    .append("clipPath")
+    .attr("id", "map-clip")
+    .append("rect");
+
 const g = svg.append('g');
 
 async function loadFireData() {
@@ -54,7 +59,6 @@ const pointsProjection = d3.geoMercator() // not geoAlbersUsa()
   .translate([width / 2, height / 2 + 20]);
 
 const path = d3.geoPath().projection(mapProjection);
-
 
 
 const mapContainer = svg.append("g").attr("id", "mapContainer");
@@ -130,12 +134,12 @@ function timeSlider(value) {
     return Math.floor(acqTime / 100) <= hour;
   });
   const visibleData = filteredByTime.filter(d => {
-  const lat = +d.latitude;
-  const lon = +d.longitude;
-  const projected = mapProjection([lon, lat]);
+    const lat = +d.latitude;
+    const lon = +d.longitude;
+    const projected = mapProjection([lon, lat]);
     return projected && lat >= 26 && lat <= 49 && lon >= -125 && lon <= -66;
   });
-  const circles = g.selectAll('circle')
+  const circles = pointsLayer.selectAll('circle')
     .data(visibleData, d => d.latitude + ',' + d.longitude);
   
   circles.enter()
@@ -145,9 +149,7 @@ function timeSlider(value) {
     .attr('r', d => sizeScale(d.frp))
     .attr('fill', 'orangered')
     .attr('opacity', 0.6)
-    .merge(circles)
-    .attr('cx', d => pointsProjection([d.longitude, d.latitude])[0])
-    .attr('cy', d => pointsProjection([d.longitude, d.latitude])[1]);
+    .merge(circles);
 
     circles.exit().remove();
   }
