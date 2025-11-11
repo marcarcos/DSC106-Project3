@@ -147,7 +147,7 @@ svg.selectAll('circle')
         //tooltipLoad(d);
         renderTooltipContent(d);
         updateTooltipVisibility(true);
-        //updateTooltipPosition(event);
+        updateTooltipPosition(event);
     })
     .on('mouseout', () => {
         updateTooltipVisibility(false);
@@ -160,11 +160,14 @@ function renderTooltipContent(fire) {
   const time = document.getElementById('tooltip-time');
   const frp = document.getElementById('tooltip-frp');
 
+  const hour = Math.round(fire.acq_time/ 100);
+  const minute = String(fire.acq_time % 100);
+
   if (Object.keys(fire).length === 0) return;
  
   lat.textContent = fire.latitude;
   lon.textContent = fire.longitude;
-  time.textContent = fire.acq_time;
+  time.textContent = `${hour}:${minute.padEnd(2, '0')}`;
   frp.textContent = fire.frp;
 }
 
@@ -174,7 +177,7 @@ function updateTooltipVisibility(isVisible) {
 }
 
 function updateTooltipPosition(event) {
-  const tooltip = document.getElementById('commit-tooltip');
+  const tooltip = document.getElementById('fire-tooltip');
   tooltip.style.left = `${event.clientX}px`;
   tooltip.style.top = `${event.clientY}px`;
 }
