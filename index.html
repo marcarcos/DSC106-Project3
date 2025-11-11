@@ -1,16 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-    
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <script src="main.js" type="module"></script>
     <link rel="stylesheet" href="global.css">
-    <script src="https://unpkg.com/topojson@3"></script>
     <title>DSC100 Project 3</title>
-    <link rel="stylesheet" href="global.css"/>
-
 </head>
+
 <body>
     <header>
         <h1>DSC 106 Project 3</h1>
@@ -18,54 +14,34 @@
 
     <p>Team Members: Shant Guedekelian, Jaden Vo, Marcelo Arcos</p>
     <p>Team Name: Visualizers</p>
+
     <main>
         <h3>Are fires more likely to start at certain hours of the day?</h3>
+
         <div>
+            <dl id="fire-tooltip" class="info tooltip" hidden>
+                <dt>Latitude</dt>
+                    <dd id="tooltip-lat"></dd>
+                <dt>Longitude</dt>
+                    <dd id="tooltip-lon"></dd>
+                <dt>Time</dt>
+                    <dd id="tooltip-time"></dd>
+                <dt>FRP</dt>
+                    <dd id="tooltip-frp"></dd>
+            </dl>
 
-          <dl id="fire-tooltip" class="info tooltip" hidden>
-            <dt>Latitude</dt>
-            <dd id="tooltip-lat"></dd>
-
-            <dt>Longitude</dt>
-            <dd id="tooltip-lon"></dd>
-
-            <dt>Time</dt>
-            <dd id="tooltip-time"></dd>
-
-            <dt>FRP</dt>
-            <dd id="tooltip-frp"></dd>
-          </dl>
-          <label for="time-slider">Select Time of Day:</label>
-          <input type="range" min="0" max="24" value="0" class="slider" id="time-slider">
+            <label for="time-slider">Select Time of Day:</label>
+            <input type="range" min="0" max="24" value="0" class="slider" id="time-slider">
         </div>
+
         <svg id="map-container"></svg>
-        <div>
-          <dl id="fire-tooltip" class="info tooltip" hidden>
-            <dt>Latitude</dt>
-            <dd id="tooltip-lat"></dd>
-
-            <dt>Longitude</dt>
-            <dd id="tooltip-lon"></dd>
-
-            <dt>Time</dt>
-            <dd id="tooltip-time"></dd>
-
-            <dt>FRP</dt>
-            <dd id="tooltip-frp"></dd>
-          </dl>
-          <label for="time-slider">Select Time of Day:</label>
-          <input type="range" min="0" max="24" value="0" class="slider" id="time-slider">
-        </div>
     </main>
 
     <footer>
-        <p>&copy; Your Name</p>
+        <p>&copy; Visualizers</p>
     </footer>
 
-    
+    <script src="main.js" type="module"></script>
 
-    <!-- <script src="script.js"></script> -->
 </body>
-
 </html>
-
